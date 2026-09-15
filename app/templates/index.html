@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate FastAPI Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <div class="max-w-4xl mx-auto space-y-8">
+        <h1 class="text-3xl font-bold text-blue-400">🚀 FastAPI Multi-Tool Dashboard</h1>
+        
+        <!-- Bot API UI -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4 text-green-400">🤖 Educational Bot Simulator</h2>
+            <form id="botForm" class="space-y-4">
+                <input type="url" name="video_url" required placeholder="Target URL..." class="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white">
+                <input type="number" name="view_count" value="10" class="w-full p-2 bg-gray-700 rounded border border-gray-600 text-white">
+                <button type="submit" class="bg-green-600 px-4 py-2 rounded hover:bg-green-500 w-full">Start Simulation</button>
+            </form>
+            <p id="botStatus" class="mt-4 text-sm text-gray-400"></p>
+        </div>
+
+        <!-- Free External API UI -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4 text-yellow-400">🌐 Free Public API (Quotes)</h2>
+            <button onclick="getQuote()" class="bg-yellow-600 px-4 py-2 rounded hover:bg-yellow-500 mb-4">Fetch Random Quote</button>
+            <blockquote id="quoteText" class="italic text-gray-300 border-l-4 border-yellow-500 pl-4"></blockquote>
+        </div>
+
+        <!-- Free AI Chat UI -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4 text-purple-400">🧠 Free AI Assistant (No Key Required)</h2>
+            <div class="flex space-x-2">
+                <input type="text" id="aiInput" placeholder="Ask the AI something..." class="flex-1 p-2 bg-gray-700 rounded border border-gray-600 text-white">
+                <button onclick="askAI()" class="bg-purple-600 px-4 py-2 rounded hover:bg-purple-500">Ask</button>
+            </div>
+            <p id="aiResponse" class="mt-4 text-sm text-gray-300"></p>
+        </div>
+    </div>
+
+    <script>
+        // Bot API script
+        document.getElementById('botForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const res = await fetch('/api/bot/simulate', { method: 'POST', body: formData });
+            const data = await res.json();
+            document.getElementById('botStatus').innerText = data.message + ' Task ID: ' + data.task_id;
+        };
+
+        // Quote API script
+        async function getQuote() {
+            const res = await fetch('/api/external/quote');
+            const data = await res.json();
+            document.getElementById('quoteText').innerText = `"${data.quote}" - ${data.author}`;
+        }
+
+        // AI API script
+        async function askAI() {
+            const msg = document.getElementById('aiInput').value;
+            document.getElementById('aiResponse').innerText = 'Thinking...';
+            const res = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg})
+            });
+            const data = await res.json();
+            document.getElementById('aiResponse').innerText = data.response;
+        }
+    </script>
+</body>
+</html>
